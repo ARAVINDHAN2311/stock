@@ -1,15 +1,17 @@
 import streamlit as st
+import numpy as np
+import pandas as pd
+from tensorflow.keras.models import load_model
+import pickle
+
+model = load_model("lstm_model.keras")
+scaler = pickle.load(open("scaler.pkl", "rb"))
 
 st.title("📈 LSTM Prediction App")
 
 input_data = st.text_input("Enter 3 values")
 
-if st.button("Predict"):
-    st.success("Prediction: 291.10")   # demo output
-import pandas as pd
-
-# inside Predict button
-if st.button("Predict"):
+if st.button("Predict", key="predict_btn"):
     try:
         values = [float(i) for i in input_data.split(",")]
 
@@ -27,9 +29,11 @@ if st.button("Predict"):
 
             st.success(f"Prediction: {pred_value}")
 
-            # 🔥 GRAPH PART
+            # Graph
             chart_data = values + [pred_value]
             df = pd.DataFrame(chart_data, columns=["Value"])
+            df["Step"] = ["t-3", "t-2", "t-1", "Pred"]
+            df = df.set_index("Step")
 
             st.line_chart(df)
 
